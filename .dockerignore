@@ -1,0 +1,6 @@
+target
+.gitignore
+Dockerfile
+.idea
+.DS_Store
+README.md
