@@ -17,7 +17,7 @@ public class BeanConfigurations {
 
             @Override
             public String greetz(String name, String surname) {
-                return "SVC - " + this.getInstance() + "Hello!! I'm an intruder!";
+                return "SVC - " + this.getInstance() + " - Hello!! I'm an intruder!";
             }
         };
     }
