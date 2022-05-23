@@ -1,10 +1,9 @@
 package example.cdi.servlets;
 
 import example.cdi.services.firstlevel.FirstLevelService;
-import example.cdi.services.qualifiers.PlainText;
-import example.cdi.services.qualifiers.ShadedText;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,22 +15,37 @@ import java.util.Optional;
 public class RestServlet extends HttpServlet {
 
     public static final String SHADED_QUERY_PARAM = "shaded";
+    public static final String INTRUDER_QUERY_PARAM = "intruder";
     public static final String NAME_QUERY_PARAM = "name";
     public static final String SURNAME_QUERY_PARAM = "surname";
 
-    @Inject @PlainText
+    @Inject
+    @Named("plain")
     FirstLevelService plainSvc;
 
-    @Inject @ShadedText
+    @Inject
+    @Named("shaded")
     FirstLevelService shadedSvc;
+
+    @Inject
+    @Named("intruder")
+    FirstLevelService intruderSvc;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
+        boolean intruder = Boolean.parseBoolean(req.getParameter(INTRUDER_QUERY_PARAM));
         boolean shaded = Boolean.parseBoolean(req.getParameter(SHADED_QUERY_PARAM));
+
         String name = Optional.ofNullable(req.getParameter(NAME_QUERY_PARAM)).orElse("John");
         String surname = Optional.ofNullable(req.getParameter(SURNAME_QUERY_PARAM)).orElse("Doe");
 
-        resp.getWriter().println((shaded ? shadedSvc : plainSvc).greetz(name, surname));
+        resp.getWriter().println(whichService(intruder, shaded).greetz(name, surname));
+    }
+
+    private FirstLevelService whichService(boolean intruder, boolean shaded) {
+        return (intruder)
+                  ? intruderSvc
+                  : (shaded) ? shadedSvc : plainSvc;
     }
 }

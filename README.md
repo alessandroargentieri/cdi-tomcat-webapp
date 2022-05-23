@@ -1,5 +1,15 @@
 # Weld integration into Tomcat
 
+```txt
+ ▄     ▄ ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄▄▄▄    ▄   ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄ ▄▄   ▄▄ ▄▄▄▄▄▄▄ ▄▄▄▄▄▄ ▄▄▄▄▄▄▄ 
+█ █ ▄ █ █       █   █   █      █ ▄█ █▄█       █       █  █▄█  █       █      █       █
+█ ██ ██ █    ▄▄▄█   █   █  ▄    █▄   ▄█▄     ▄█   ▄   █       █       █  ▄   █▄     ▄█
+█       █   █▄▄▄█   █   █ █ █   █ █▄█   █   █ █  █ █  █       █     ▄▄█ █▄█  █ █   █  
+█       █    ▄▄▄█   █▄▄▄█ █▄█   █       █   █ █  █▄█  █       █    █  █      █ █   █  
+█   ▄   █   █▄▄▄█       █       █       █   █ █       █ ██▄██ █    █▄▄█  ▄   █ █   █  
+█▄▄█ █▄▄█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄▄▄▄█        █▄▄▄█ █▄▄▄▄▄▄▄█▄█   █▄█▄▄▄▄▄▄▄█▄█ █▄▄█ █▄▄▄█  
+```
+
 The purpose of this project is to demonstrate the CDI integration in a Java web application.
 
 The CDI library that has been chosen is [Weld](https://weld.cdi-spec.org/), already integrated with [TomEE](https://tomee.apache.org/) Application Server.
@@ -37,9 +47,9 @@ Add Weld dependency in your project `pom.xml` file:
 
 ```xml
 <dependency>
-   <groupId>org.jboss.weld.servlet</groupId>
-   <artifactId>weld-servlet-shaded</artifactId>
-   <version>3.1.6.Final</version>
+    <groupId>org.jboss.weld.servlet</groupId>
+    <artifactId>weld-servlet-shaded</artifactId>
+    <version>3.1.6.Final</version>
 </dependency>
 ```
 
@@ -59,7 +69,7 @@ After having added the maven dependency, register the _Weld BeanManager_ in your
 
 ### Define an empty `beans.xml` file
 
-even if you decide to declare your beans through the annotations, you must provide your project with a `src/main/webapp/WEB-INF/beans.xml` file:
+even if you decide to declare your beans through the annotations, you must provide your project with a `src/main/resources/META-INF/beans.xml` file:
 
 ```xml
 <beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -88,7 +98,7 @@ To inject the Weld generated bean (which is `@ApplicationScoped` by default) you
 import javax.inject.Inject;
 
 class VehicleRegistry {
-    
+
     @Inject
     private Vehicle vehicle;
     
@@ -96,7 +106,55 @@ class VehicleRegistry {
 }
 ```
 
-If more than a single implementation of the same interface exists, you can specialize the injection using custom annotations:
+If more than a single implementation of the same interface exists, you can specialize the injection using the `@Named` annotations or custom qualifiers annotations as explained below.
+
+#### Disambiguation using the `@Named` annotation
+
+In order to let Weld understand what implementation of an interface to inject in a specific case you can use the `@Named` annotation on the `@ManagedBean` and during the injection phase:
+
+```java
+import javax.inject.Inject;
+import javax.inject.Named;
+
+class VehicleRegistry {
+
+    @Inject @Named("car")
+    private Vehicle car;
+
+    @Inject @Named("bike")
+    private Vehicle bike;
+    
+    ...
+}
+```
+
+where the managed beans are labeled with the same attribute, to let the disambiguation happen:
+
+```java
+import javax.annotation.ManagedBean;
+import javax.inject.Named;
+
+@ManagedBean
+@Named("car")
+class Car implements Vehicle {
+    ...
+}
+```
+
+```java
+import javax.annotation.ManagedBean;
+import javax.inject.Named;
+
+@ManagedBean
+@Named("bike")
+class Bike implements Vehicle {
+    ...
+}
+```
+
+#### Disambiguation using a custom qualifier annotation
+
+Another way to disambiguate the injection of a bean is using custom qualifier annotations as follows:
 
 ```java
 class VehicleRegistry {
@@ -111,7 +169,7 @@ class VehicleRegistry {
 }
 ```
 
-where the custom annotations are defined as follows:
+where the custom annotations are defined as:
 
 ```java
 @Qualifier
@@ -127,7 +185,7 @@ where the custom annotations are defined as follows:
 @interface Bike {}
 ```
 
-And the respective beans are declared by using these two _qualifiers_:
+and the respective beans are declared by using these two _qualifiers_:
 
 ```java
 import javax.annotation.ManagedBean;
@@ -145,6 +203,46 @@ import javax.annotation.ManagedBean;
 @ManagedBean
 @Bike
 class Bike implements Vehicle {
+    ...
+}
+```
+
+## Producer methods
+
+If you want to strictly control the bean generation you can inject your beans using a producer method:
+
+```java
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Named;
+
+class BeanConfiguration {
+
+    @Produces
+    @Named("quad")
+    @ApplicationScoped
+    public Vehicle createVehicle() {
+        return new Quad();
+    }
+}
+```
+
+where `Quad` class doesn't have the annotation `@ManagedBean` because the bean is not managed directly by Weld but only through a _producer_ method.
+
+So the bean can be injected this way:
+
+```java
+class VehicleRegistry {
+
+    @Inject @Named("car")
+    private Vehicle car;
+
+    @Inject @Named("bike")
+    private Vehicle bike;
+
+    @Inject @Named("quad")
+    private Vehicle quad;
+    
     ...
 }
 ```
