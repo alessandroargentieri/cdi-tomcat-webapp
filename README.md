@@ -49,7 +49,7 @@ Add Weld dependency in your project `pom.xml` file:
 <dependency>
     <groupId>org.jboss.weld.servlet</groupId>
     <artifactId>weld-servlet-shaded</artifactId>
-    <version>3.1.6.Final</version>
+    <version>5.0.0.Final</version>
 </dependency>
 ```
 
