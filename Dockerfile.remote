@@ -1,0 +1,13 @@
+FROM maven:3.8.3-jdk-11-slim as build
+WORKDIR /tmp/context
+ARG VERSION=v1.0.0
+ADD https://github.com/alessandroargentieri/cdi-tomcat-webapp/archive/refs/tags/${VERSION}.tar.gz .
+RUN tar -xvzf $(ls)
+RUN ls $(ls -t | head -1) | xargs -I {} mv $(ls -t | head -1)/{} .
+RUN mvn clean package
+
+FROM tomcat:10.1.0-jre11-temurin-focal
+WORKDIR $CATALINA_HOME
+COPY --from=build /tmp/context/target/cdi-project-*.war ./webapps/cdi.war
+
+EXPOSE 8080/tcp
