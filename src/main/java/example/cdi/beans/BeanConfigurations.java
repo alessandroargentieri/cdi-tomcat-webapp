@@ -2,9 +2,9 @@ package example.cdi.beans;
 
 import example.cdi.services.firstlevel.FirstLevelService;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Named;
 
 public class BeanConfigurations {
 

@@ -3,7 +3,7 @@ WORKDIR /tmp/context
 COPY . .
 RUN mvn clean package
 
-FROM tomcat:9.0-jre11-temurin-focal
+FROM tomcat:10.1.0-jre11-temurin-focal
 WORKDIR $CATALINA_HOME
 COPY --from=build /tmp/context/target/cdi-project-*.war ./webapps/cdi.war
 

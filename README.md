@@ -62,7 +62,7 @@ After having added the maven dependency, register the _Weld BeanManager_ in your
 <Context>
     <Resource name="BeanManager"
               auth="Container"
-              type="javax.enterprise.inject.spi.BeanManager"
+              type="jakarta.enterprise.inject.spi.BeanManager"
               factory="org.jboss.weld.resources.ManagerObjectFactory" />
 </Context>
 ```
@@ -84,7 +84,7 @@ even if you decide to declare your beans through the annotations, you must provi
 When you have to define a class from which Weld has to generate a bean, it's recommended to use the `@ManagedBean` annotation.
 
 ```java
-import javax.annotation.ManagedBean;
+import jakarta.annotation.ManagedBean;
 
 @ManagedBean
 class Car implements Vehicle { 
@@ -95,7 +95,7 @@ class Car implements Vehicle {
 To inject the Weld generated bean (which is `@ApplicationScoped` by default) you use the annotation `@Inject`:
 
 ```java
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 class VehicleRegistry {
 
@@ -113,8 +113,8 @@ If more than a single implementation of the same interface exists, you can speci
 In order to let Weld understand what implementation of an interface to inject in a specific case you can use the `@Named` annotation on the `@ManagedBean` and during the injection phase:
 
 ```java
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 class VehicleRegistry {
 
@@ -131,8 +131,8 @@ class VehicleRegistry {
 where the managed beans are labeled with the same attribute, to let the disambiguation happen:
 
 ```java
-import javax.annotation.ManagedBean;
-import javax.inject.Named;
+import jakarta.annotation.ManagedBean;
+import jakarta.inject.Named;
 
 @ManagedBean
 @Named("car")
@@ -142,8 +142,8 @@ class Car implements Vehicle {
 ```
 
 ```java
-import javax.annotation.ManagedBean;
-import javax.inject.Named;
+import jakarta.annotation.ManagedBean;
+import jakarta.inject.Named;
 
 @ManagedBean
 @Named("bike")
@@ -188,7 +188,7 @@ where the custom annotations are defined as:
 and the respective beans are declared by using these two _qualifiers_:
 
 ```java
-import javax.annotation.ManagedBean;
+import jakarta.annotation.ManagedBean;
 
 @ManagedBean
 @Car
@@ -198,7 +198,7 @@ class Car implements Vehicle {
 ```
 
 ```java
-import javax.annotation.ManagedBean;
+import jakarta.annotation.ManagedBean;
 
 @ManagedBean
 @Bike
@@ -212,9 +212,9 @@ class Bike implements Vehicle {
 If you want to strictly control the bean generation you can inject your beans using a producer method:
 
 ```java
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Named;
 
 class BeanConfiguration {
 
@@ -256,8 +256,8 @@ If you don't have a no-args constructor class, or you need some parameters to be
 Let's see some example:
 
 ```java
-import javax.annotation.ManagedBean;
-import javax.inject.Named;
+import jakarta.annotation.ManagedBean;
+import jakarta.inject.Named;
 
 @ManagedBean
 @Named("car")
@@ -269,8 +269,8 @@ class Car implements Vehicle {
 ```
 
 ```java
-import javax.annotation.ManagedBean;
-import javax.inject.Named;
+import jakarta.annotation.ManagedBean;
+import jakarta.inject.Named;
 
 @ManagedBean
 @Named("car")
@@ -289,7 +289,7 @@ class Car implements Vehicle {
 If we have a servlet, which is not a bean managed by Weld but it's an instance managed by a servlet container (in our case Tomcat), **that approach is not possible and would return an error**:
 
 ```java
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @WebServlet("/greetz")
 public class CarServlet extends HttpServlet {

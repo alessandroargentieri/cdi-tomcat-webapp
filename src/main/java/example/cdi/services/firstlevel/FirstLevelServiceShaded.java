@@ -2,11 +2,11 @@ package example.cdi.services.firstlevel;
 
 import example.cdi.services.secondlevel.SecondLevelService;
 
-import javax.annotation.ManagedBean;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.annotation.ManagedBean;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @ManagedBean
 @Named("shaded")

@@ -1,6 +1,6 @@
 package example.cdi.services.secondlevel;
 
-import javax.annotation.ManagedBean;
+import jakarta.annotation.ManagedBean;
 
 @ManagedBean
 public class SecondLevelServiceImpl implements SecondLevelService {
