@@ -18,16 +18,33 @@ In this case, we're going to integrate this library in a Java web application de
 
 ## Run application
 
+You can either decide to run the application by cloning the repository or not.
+
+### Build the container image without cloning the repository
+
+The project has been provided of a remote version of the Dockerfile. So you can build the image without cloning the repo:
+
+```bash
+$ docker build --build-arg VERSION=v1.0.0 -t myaccount/cdi https://raw.githubusercontent.com/alessandroargentieri/cdi-tomcat-webapp/master/Dockerfile.remote
+```
+
+### Build the container by cloning repository
+
 This application has been provided with a Dockerfile to avoid deploying the generated war file into a locally installed tomcat.
 To run this application, first build the container image:
 
 ```bash
+$ git clone https://github.com/alessandroargentieri/cdi-tomcat-webapp.git
+$ cd cdi-tomcat-webapp
 $ docker build -t myaccount/cdi .
 ```
+
+### Run the image 
+
 After the image is ready run it on your machine:
 
 ```bash
-$ docker run -it -p 8080:8080 --name mycdi cdi:latest
+$ docker run -it -p 8080:8080 --name mycdi myaccount/cdi:latest
 ```
 Then you can [cURL](https://curl.se/) the servlet:
 
