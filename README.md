@@ -246,3 +246,60 @@ class VehicleRegistry {
     ...
 }
 ```
+
+## Args constructor
+
+Weld takes advantage of the default no-args constructor that a class has to create a bean for that class.
+When injecting the bean, it uses reflection to pass the newly created bean to the injected class.
+If you don't have a no-args constructor class, or you need some parameters to be injected at creation time you can use `@Inject` onto constructor class **if that class is a bean**
+
+Let's see some example:
+
+```java
+import javax.annotation.ManagedBean;
+import javax.inject.Named;
+
+@ManagedBean
+@Named("car")
+class Car implements Vehicle {
+    // it uses the reflection
+    @Inject 
+    private Engine engine;
+}
+```
+
+```java
+import javax.annotation.ManagedBean;
+import javax.inject.Named;
+
+@ManagedBean
+@Named("car")
+class Car implements Vehicle {
+   
+    private final Engine engine;
+    
+    // it injects into the constructor BECAUSE Car is a BEAN too!!!
+    @Inject
+    Car(final Engine engine) {
+        this.engine = engine;
+    }
+}
+```
+
+If we have a servlet, which is not a bean managed by Weld but it's an instance managed by a servlet container (in our case Tomcat), **that approach is not possible and would return an error**:
+
+```java
+import javax.inject.Inject;
+
+@WebServlet("/greetz")
+public class CarServlet extends HttpServlet {
+
+    private final VehicleService carService;
+
+    // ERROR! @Inject on constructor makes CarServlet a Weld bean which is not true!
+    @Inject
+    public CarServlet(@Named("carService") final VehicleService carService) {
+        this.carService = carService;
+    }
+}
+```

@@ -13,12 +13,16 @@ import javax.inject.Named;
 @RequestScoped
 public class FirstLevelServicePlain implements FirstLevelService {
 
+    final SecondLevelService secondLevelService;
+
     @Inject
-    SecondLevelService secondLevelService;
+    public FirstLevelServicePlain(final SecondLevelService secondLevelService) {
+        this.secondLevelService = secondLevelService;
+    }
 
     @Override
     public String greetz(String name, String surname) {
-        return (String.format("SVC: %s - ", this.getInstance()) + "Hi" + secondLevelService.getComposedName(name, surname)).toUpperCase();
+        return (String.format("SVC: %s - ", this.getInstance()) + "Hi " + secondLevelService.getComposedName(name, surname)).toUpperCase();
     }
 
     @PostConstruct
