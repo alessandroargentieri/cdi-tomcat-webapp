@@ -320,3 +320,53 @@ public class CarServlet extends HttpServlet {
     }
 }
 ```
+
+## Programmatic injection
+
+As mentioned above, the `@Inject` annotation works in a class which is a bean or in a class which is instantiated by Tomcat and that can be easily linked to Weld.
+There are other particular cases for which, this annotation cannot work properly. In that case, we're goind to use a programmatic injection when needed.
+
+For example the classes annotated with `@jakarta.websocket.server.ServerEndpoint` are instantiated by Tomcat **but not directly linkable to Weld!**
+In this case, to inject some beans inside these classes, we're going to use a programmatic approach:
+
+```java
+@ServerEndpoint("/vehicles")
+public class VehiclesEndpoint {
+
+    private Vehicle car;
+    private Vehicle bike;
+    private Vehicle quad;
+
+    // this constructor is called by Tomcat
+    public VehicleEndpoint() {
+        // you can specify class type and named annotation
+        this.car = CDI.current().select(Vehicle.class, NamedAnnotation.of("car")).get(); 
+        // you can avoid specifying class type but then you need to cast the result
+        this.bike = (Vehicle) CDI.current().select(NamedAnnotation.of("bike")).get();
+        // it works also when the bean is produced by a method annotated with @Produces
+        this.quad = CDI.current().select(Vehicle.class, NamedAnnotation.of("quad")).get(); 
+    }
+}
+```
+
+With `NamedAnnotation` defined locally as follows:
+
+```java
+public class NamedAnnotation extends AnnotationLiteral<Named> implements Named {
+
+    private final String value;
+
+    public NamedAnnotation(final String value) {
+        this.value = value;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    public static NamedAnnotation of(String value) {
+        return new NamedAnnotation(value);
+    }
+}
+```
+
